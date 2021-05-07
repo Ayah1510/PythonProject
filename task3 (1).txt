@@ -1,0 +1,113 @@
+import datetime
+from datetime import date
+import calendar
+def rent(list):
+        carlist=[]
+        price=40
+
+        for i in list:
+                if not carlist:
+                        carlist.append(i[4])
+                elif i[4] not in carlist:
+                        carlist.append(i[4])
+
+        availablelist=[]
+        #getting the renting dates from the user
+        d, m, y=[int(x) for x in input("\nPlease enter the start date for renting the car (as DD/MM/YYYY) :\n").split('/')]
+        d1, m1 ,y1=[int(x) for x in input("Please enter the end date for renting the car (as DD/MM/YYYY) :\n").split('/')]
+        userbeg=date(y, m, d)
+        userend=date(y1, m1, d1)
+        #checking each car from the carlist if it is available during the dates entered by the user
+        #and saving available cars in available array
+        for j in carlist:
+                flag=1
+                for i in list:
+                        if j==i[4]:
+                                cl=i[5]
+                                year=i[6]
+                                date1=i[7].split()
+                                if date1[0].startswith('0') == True:
+                                        date1[0]=date1[0][1]
+                                date2=i[8].split()
+                                if date2[0].startswith('0') == True:
+                                        date2[0]=date2[0][1]
+                                da1=date(int(date1[2]),int(datetime.datetime.strptime(date1[1], "%B").month),int(date1[0]))
+                                da2=date(int(date2[2]),int(datetime.datetime.strptime(date2[1], "%B").month),int(date2[0]))
+                                if not((userbeg>=da2) or (userbeg<=da2 and userend<=da1)) :
+                                        flag=0
+                                        break
+                if flag==1:
+                        availablelist.append([j,cl,year])
+        if not availablelist:
+                print("\nThere is no available cars during the given date")
+        else:
+                print("\nCars available during the given dates:")
+                for i in availablelist:
+                        print(i[0],i[1],i[2])
+        if availablelist:
+                #asking the user enter cl for the car he wants
+                ans=input("\nIf you want to rent one of the available cars. Please enter Yes\n").lower()
+                if ans=="yes":
+                        correct=1
+                        #to check if the user entered the cl right
+                        while(correct==1):
+                                cl=input("Please enter the car license number you want to rent:\n")
+                                for i in availablelist:
+                                        if cl==i[0]:
+                                                cm=i[1]
+                                                year=i[2]
+                                                correct=0
+                                                break
+                                        else:
+                                                correct=1
+                                if correct==1:
+                                        print("Wrong entry!")
+                        #calculating the amount for the rent
+                        prcie=40
+                        if year=="2019":
+                                price+=10
+                        elif year=="2020":
+                                price+=20
+                        numofdays=(userend-userbeg).days
+                        numofdays+=1
+                        rb=price*numofdays
+                        print("The price for renting the car for the specific days is:",rb)
+                        ans=input("If you want to continue renting. Please enter Yes\n").lower()
+                        if ans=="yes":
+                                #asking the user to fill all required data
+                                print("\nPlease submit the following information to complete the renting")
+                                name=input("Please enter your full name:\n")
+                                id=input("Please enter your id:\n")
+                                d2, m2, y2=[int(x) for x in input("Please enter your date of birth (as dd/mm/yyyy) :\n").split('/')]
+                                charm2=calendar.month_name[m2]
+                                dob=str(d2)+" "+charm2+" "+str(y2)
+                                mobile=input("Please enter your mobile number:\n")
+                                charm=calendar.month_name[m]
+                                sd=str(d)+" "+charm+" "+str(y)
+                                charm1=calendar.month_name[m1]
+                                ed=str(d1)+" "+charm1+" "+str(y1)
+                                #adding the new entry to the database and then saving it to the file
+                                list.append([name,id,dob,mobile,cl,cm,year,sd,ed,rb])
+                                newdata=""
+                                for i in list:
+                                        indexi=0
+                                        for j in i:
+                                                newdata+=str(j)
+                                                if indexi != 9:
+                                                        newdata+=";"
+                                                indexi+=1
+                                        newdata+="\n"
+                                f = open("CarRentalCompleted.txt","w") 
+                                f.write(newdata)
+                                f.close()
+                                print("Registeration for renting the car is completed")
+def task3do():
+        f=open("CarRentalCompleted.txt")
+        data=[]
+        for line in f:
+                line=line.strip()
+                data.append(line.split(';'))
+        f.close()
+        rent(data)
+
+

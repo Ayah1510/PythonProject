@@ -1,0 +1,119 @@
+#Inquiry using the name
+def nameInquiry(list,name):
+        flagn=1       #to check if the name is in the data base or not
+        carlist=[]    #to save the car informations which are rented by the person
+        person=[]    #to save the person's informations
+        sum=0
+        for i in list:
+                #to find the same name in the data base as the name entered
+                if i[0].lower()==name.lower():
+                        person=i      #to save the person informations
+                        carlist.append(i[4]+"  "+i[5]+"  "+i[6])   #to save the car informations rented by the person
+                        sum+=int(i[9])     #to find the amount paid by the person
+                        flagn=0
+        if  flagn==0:
+                print("\nName :",name)
+                print("Id :",person[1])
+                print("Date of birth(DOB) :",person[2])
+                print("Mobile :",person[3])
+                print("\nAll cars rented by this person:")
+                for i in carlist:
+                        print(i)
+                print("The total amount paid by this person for renting cars:")
+                print(sum)
+        else:
+                print("Name entered is not in the database!\n")
+
+#inquiry by the id
+def IdInquiry(list,Id):
+        carlist=[]  #to save the car informations which are rented by the person
+        person=[]  #to save the person's informations
+        sum=0
+        flagid=1    #to check if the id is in the data base or not
+        for i in list:
+                #to find the same id in the data base as the id entered
+                if i[1]==Id:
+                        person=i   #to save the person informations
+                        carlist.append(i[4]+"  "+i[5]+"  "+i[6])  #to save the car informations rented by the person
+                        sum+=int(i[9])   #to find the amount paid by the person
+                        flagid=0
+        if flagid == 0:
+                print("\nName :",person[0])
+                print("Id :",person[1])
+                print("Date of birth(DOB) :",person[2])
+                print("Mobile :",person[3])
+                print("\nAll cars rented by this person:")
+                for i in carlist:
+                        print(i)
+                print("The total amount paid by this person for renting cars:")
+                print(sum)
+        else:
+                print("Id entered is not in the data base!\n")
+
+#inquiry by the Cl
+def CLInquiry(list,CL):
+        carinfo=[]  #to save the car informations
+        people =[]  #to save the people informations who rented the car
+        sum=0
+        flagcl=1   #to check if the id is in the data base or not
+        for i in list:
+                #to find the same id in the data base as the id entered
+                if i[4]==CL:
+                        carinfo=i    #to save the car information
+                        people.append(i[0])    #to save the people information who rented the car
+                        people.append(i[1])
+                        people.append(i[2])
+                        people.append(i[3])
+                        sum+=int(i[9])      #to find the revenue made by renting the car
+                        flagcl=0
+        if flagcl==0:
+                print("\nCar license number(CL) :",carinfo[4])
+                print("Car Make(CM) :",carinfo[5])
+                print("Year of manufacutring :",carinfo[6])
+                print("\nAll persons rented the car :")
+                i=0
+                while i < len(people):
+                        i0=people[i]
+                        i1=people[i+1]
+                        i2=people[i+2]
+                        i3=people[i+3]
+                        print('{:<25s}{:<11s}{:<20s}{:<12s}'.format(i0,i1,i2,i3)) #":<" is for the left align
+                        i+=4
+                print("revenue made by renting the car:")
+                print(sum)
+        else:
+                print("Car license(CL) entered is not in the data base!\n")
+
+def task2do():
+        #to read the text file and save the records in data array
+        f=open("CarRentalCompleted.txt")
+        data=[]
+        for line in f:
+                line=line.strip()
+                data.append(line.split(';'))
+        f.close()
+
+        flag="1"
+        #to check if the user wants to continue inquiring
+        while flag == "1":
+                choice=int(input("\n1.Inquiry about a person\n2.Inquiry about car\nPlease enter your choice:\n"))
+                if(choice==1):
+                        choice=int(input("\n1.Inquiry using a Name\n2.Inquiry using an Id\nPlease enter your choice:\n"))
+                        if choice==1:
+                                name=input("\nPlease enter the name:\n")
+                                nameInquiry(data,name)
+                        elif choice==2:
+                                id=input("\nPlease enter the ID:\n")
+                                IdInquiry(data,id)
+                        else:
+                                print("Unvalid entry!")
+
+                elif(choice==2):
+                        CL=input("\nPlease enter the Car license number(CL):\n")
+                        CLInquiry(data,CL)
+                else:
+                        print("Unvalid entry!")
+                flag=input("\nIf you want to continue. please enter 1:\n")
+
+
+

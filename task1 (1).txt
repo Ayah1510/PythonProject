@@ -1,0 +1,330 @@
+import calendar
+
+#to modify wrong date format in the data base
+def modifyDates(list):
+        ndatechange=0     #to count the changed dates and the wrong dates
+        for i in list:
+                #check for the date of birth for the person
+                if i[2].find('-') != -1:
+                        ndatechange+=1   #to increase the number of changed dates
+                        month=i[2][3:5]
+                        if month.startswith('0') == True:  #to remove the beginning 0 from the month date bc the calendar.month_name method does not spport it
+                                monthnew=month[1]
+                        else:
+                                monthnew=month
+                        #copying the day date first so it will not be replaced if it matches the month date
+                        #copying the rest of the date with replacing the month date with suitable month words once
+                        i[2]=i[2][0:3]+i[2][3:].replace(i[2][3:5],calendar.month_name[int(monthnew)],1)
+                        i[2]=i[2].replace('-',' ')        #replacing the - with a space
+                elif i[2].find('/') != -1:
+                        ndatechange+=1
+                        month=i[2][3:5]
+                        if month.startswith('0') == True:
+                                monthnew=month[1]
+                        else:
+                                monthnew=month
+                        i[2]=i[2][0:3]+i[2][3:].replace(i[2][3:5],calendar.month_name[int(monthnew)],1)
+                        i[2]=i[2].replace('/',' ')
+                #check for the car rent start date
+                if i[7].find('-') != -1:
+                        ndatechange+=1
+                        month=i[7][3:5]
+                        if month.startswith('0') == True:
+                                monthnew=month[1]
+                        else:
+                                monthnew=month
+                        i[7]=i[7][0:3]+i[7][3:].replace(i[7][3:5],calendar.month_name[int(monthnew)],1)
+                        i[7]=i[7].replace('-',' ')
+                elif i[7].find('/') != -1:
+                        ndatechange+=1
+                        month=i[7][3:5]
+                        if month.startswith('0') == True:
+                                monthnew=month[1]
+                        else:
+                                monthnew=month
+                        i[7]=i[7][0:3]+i[7][3:].replace(i[7][3:5],calendar.month_name[int(monthnew)],1)
+                        i[7]=i[7].replace('/',' ')
+                #check for the car rent end date
+                if i[8].find('-') != -1:
+                        ndatechange+=1
+                        month=i[8][3:5]
+                        if month.startswith('0') == True:
+                                monthnew=month[1]
+                        else:
+                                monthnew=month
+                        i[8]=i[8][0:3]+i[8][3:].replace(i[8][3:5],calendar.month_name[int(monthnew)],1)
+                        i[8]=i[8].replace('-',' ')
+                elif i[8].find('/') != -1:
+                        ndatechange+=1
+                        month=i[8][3:5]
+                        if month.startswith('0') == True:
+                                monthnew=month[1]
+                        else:
+                                monthnew=month
+                        i[8]=i[8][0:3]+i[8][3:].replace(i[8][3:5],calendar.month_name[int(monthnew)],1)
+                        i[8]=i[8].replace('/',' ')
+        return ndatechange
+
+#to count the number of entries where personal information cannot be completed (too many fields are dropped such as name, Id and mobile)
+def countPEntry(list):
+        npentry=0
+        for i in list:
+#to see if the name and id and mobile fields are empty
+                if i[0] == "" and i[1] == "" and i[3] == "":
+                        npentry+=1
+        return npentry
+
+#to count missing name fields and complete it if possible
+def completeName(list):
+        ndropnames=0       #to count number of missing name field
+        nrecoverednames=0  #to count the completed names
+        for i in list:
+                if i[0] == "":
+                        ndropnames+=1
+                        for j in list:
+                                #to look for similar ids but not the same index and with the id fields and the name field are completed
+                                if j[0] != "" and j[1] != "" and i[1] != "" and j[1] == i[1] and list.index(i)!=list.index(j):
+                                        i[0]=j[0]  #copying the same name to the missing name field
+                                        nrecoverednames+=1
+                                        break
+                                #to look for similar phone numbers but not the same index and with the phone fields and the name field are completed
+                                elif j[0] != "" and j[3] != "" and i[3] !="" and j[3] == i[3] and list.index(i)!=list.index(j):
+                                        i[0]=j[0]
+                                        nrecoverednames+=1
+                                        break
+        return ndropnames, nrecoverednames
+
+#to count missing Id fields and complete it if possible
+def completeId(list):
+        ndropids=0       #to count the missing Id fields
+        nrecoveredids=0  #to count the completed Ids
+        for i in list:
+                if i[1] == "":
+                        ndropids+=1
+                        for j in list:
+                                #to look for similar names but not the same index and with the name fields and the Id field are completed
+                                if j[1] != "" and j[0] != "" and i[0] != "" and j[0] == i[0] and list.index(i)!=list.index(j):
+                                        i[1]=j[1]     #copying the same ID to the missing name field
+                                        nrecoveredids+=1
+                                        break
+                                #to look for similar phone numbers but not the same index and with the phone fields and the Id field are completed
+                                elif j[1] != "" and j[3] != "" and i[3] != "" and j[3] == i[3] and list.index(i)!=list.index(j):
+                                        i[1]=j[1]
+                                        nrecoveredids+=1
+                                        break
+        return ndropids, nrecoveredids
+
+#to count missing date of birth fields and complete it if possible
+def completeDOB(list):
+        ndropdob=0       #to count the missing dob fields
+        nrecovereddob=0  #to count the completed dobs
+        for i in list:
+                if i[2] == "":
+                        ndropdob+=1
+                        for j in list:
+                                #to look for similar names but not the same index and with the name fields and the dob field are completed
+                                if j[2] != "" and j[0] != "" and i[0] != "" and j[0] == i[0] and list.index(i)!=list.index(j):
+                                        i[2]=j[2]     #copying the same date of birth to the missing name field
+                                        nrecovereddob+=1
+                                        break
+                                #to look for similar ids but not the same index and with the id fields and the dob field are completed
+                                elif j[2] != "" and j[1] != "" and i[1] != "" and j[1] == i[1] and list.index(i)!=list.index(j):
+                                        i[2]=j[2]
+                                        nrecovereddob+=1
+                                        break
+                                #to look for similar phone numbers but not the same index and with the phone fields and the dob field are completed
+                                elif j[2] != "" and j[3] != "" and i[3] != "" and j[3] == i[3] and list.index(i)!=list.index(j):
+                                        i[2]=j[2]
+                                        nrecovereddob+=1
+                                        break
+        return ndropdob, nrecovereddob
+
+#to count missing mobile fields and complete it if possible
+def completeMobile(list):
+        ndropmobile=0      #to count the missing mobile fields
+        nrecoveredmobile=0  #to count the completed mobiles
+        for i in list:
+                if i[3] == "":
+                        ndropmobile+=1
+                        for j in list:
+                                #to look for similar names but not the same index and with the name fields and the mobile field are completed
+                                if j[3] != "" and j[0] != "" and i[0] != "" and j[0] == i[0] and list.index(i)!=list.index(j):
+                                        i[3]=j[3]     #copying the same mobile to the missing name field
+                                        nrecoveredmobile+=1
+                                        break
+                                #to look for similar Ids but not the same index and with the Id fields and the mobile field are completed
+                                elif j[3] != "" and j[1] != "" and i[1] != "" and j[1] == i[1] and list.index(i)!=list.index(j):
+                                        i[3]=j[3]
+                                        nrecoveredmobile+=1
+                                        break
+        return ndropmobile, nrecoveredmobile
+
+#to count missing mobile fields and complete it if possible
+def completeCarMake(list):
+        ndropcmake=0       #to count the missing car mak fields
+        nrecoveredcmake=0  #to count the completed car makes
+        for i in list:
+                if i[5] == "":
+                        ndropcmake+=1
+                        for j in list:
+                                #to look for similar car Ids but not the same index and with the car Id fields and the car make field are completed
+                                if j[5] != "" and j[4] != "" and i[4] != "" and j[4] == i[4] and list.index(i)!=list.index(j):
+                                        i[5]=j[5]  #copying the same car make to the missing name field
+                                        nrecoveredcmake+=1
+                                        break
+        return ndropcmake, nrecoveredcmake
+
+#to count missing car year fields and complete it if possible
+def completeYear(list):
+        ndropyear=0       #to count missing car year fields
+        nrecoveredyear=0  #to count the completed car years
+        for i in list:
+                if i[6] == "":
+                        ndropyear+=1
+                        for j in list:
+                                #to look for similar car years but not the same index and with the car Id fields and the car year field are completed
+                                if j[6] != "" and j[4] != "" and i[4] != "" and j[4] == i[4] and list.index(i)!=list.index(j):
+                                        i[6]=j[6]       #copying the same car year to the missing name field
+                                        nrecoveredyear+=1
+                                        break
+        return ndropyear, nrecoveredyear
+
+#to count missing car ID fields
+def countCID(list):
+        ncid=0
+        for i in list:
+                if i[4] == "":
+                        ncid+=1
+        return ncid
+
+#to divide the records into 2 strings, the missing and the completed
+def moveData(list):
+        complete=""
+        notcomplete=""
+        flag=0   #to indicate that the record has a missing field
+        for i in list:
+                for j in range(10):
+                        #to copy the records with the missing fileds by checking each field
+                        if i[j] == "":
+                                indexi=0
+                                for k in i:
+                                        notcomplete+=k
+                                        #to not put ";" on the end of the line
+                                        if indexi != 9:
+                                                notcomplete+=";"
+                                        indexi+=1
+                                notcomplete+="\n"
+                                flag=1
+                                break  #to break when the first missing field is found
+                #to copy the records with the completed fields
+                if flag == 0:
+                        indexi=0
+                        for k in i:
+                                complete+=k
+                                if indexi != 9:
+                                        complete+=";"
+                                indexi+=1
+                        complete+="\n"
+                flag=0
+        return complete, notcomplete
+
+#to remove dublicates from the completed database
+def removeDub(list):
+        ndub=0    #toocount the records which has a dublicate
+        i=0
+        # a while loop is used to change the inde of the loop when needed
+        while i < len(list):
+                i1=list[i]
+                j=0
+                while j < len(list):
+                        j1=list[j]
+                        #to check if the names are the same
+                        if i1[0].lower() == j1[0].lower() and i!=j:
+                                #to check if the fields about the car and the renting are the same
+                                #the id and date of birth and mobile are not checked bc they are the same for the same person
+                                if i1[4]==j1[4] and i1[5]==j1[5] and i1[6]==j1[6] and i1[7]==j1[7] and i1[8]==j1[8] and i1[9]==j1[9]:
+                                        del list[j]      #deleting the dublicate
+                                        ndub+=1
+                                        j-=1       #the index was decreased bc when deleting the dublicate the next record becomes in the place of the deleted one
+                        j+=1   #to move one step in the records
+                i+=1
+        #to write the new records without the dublicates in the CarRentalCompleted text file
+        newdata=""
+        for i in list:
+                indexi=0
+                for j in i:
+                        newdata+=j
+                        if indexi != 9:
+                                newdata+=";"
+                        indexi+=1
+                newdata+="\n"
+        f = open("CarRentalCompleted.txt","w")  #it will overwrite the file if it exists to writ on it or creates a new one
+        f.write(newdata)
+        f.close()
+        return ndub
+
+def task1do():
+        #copying the records from the text file to the array data
+        data=[]
+        f = open("CarRentalOld.txt","r")
+        for line in f:
+                line=line.strip()
+                data.append(line.split(';'))
+        f.close()
+
+        #calling the functions
+        ndatechange=modifyDates(data)
+        npentry=countPEntry(data)
+        ndropnames, nrecoverednames=completeName(data)
+        ndropids, nrecoveredids=completeId(data)
+        ndropmobile, nrecoveredmobile=completeMobile(data)
+        #to remove the number of entries from the number of names,ids and dobs
+        ndropnames-=npentry
+        ndropids-=npentry
+        ndropmobile-=npentry
+        ndropdob, nrecovereddob=completeDOB(data)
+        ndropcmake, nrecoveredcmake=completeCarMake(data)
+        ndropyear, nrecoveredyear=completeYear(data)
+        ncid=countCID(data)
+        datacompleted, datanotcompleted=moveData(data)
+
+        #writting the missing an completed records on seperated specific files
+        f = open("CarRentalMissing.txt","w")
+        f.write(datanotcompleted)
+        f.close()
+        f = open("CarRentalCompleted.txt","w")
+        f.write(datacompleted)
+        f.close()
+
+        #reading the completed records to removing the dublicates
+        datacom=[]
+        f=open("CarRentalCompleted.txt","r")
+        for line in f:
+                line=line.strip()
+                datacom.append(line.split(';'))
+        f.close()
+        ndub=removeDub(datacom)
+
+        #printing the results
+        print("Summary of data missing in the database:")
+        print("Number of dublicate entries in the database is:",ndub)
+        print("Number of entries with wrong date formats from the datebase is:",ndatechange)
+        print("Number of entries where names are dropped from the database is:",ndropnames)
+        print("Number of entries where Ids are dropped from the database is:",ndropids)
+        print("Number of entries where dates of birth are dropped from the database is:",ndropdob)
+        print("Number of entries where mobile numbers are dropped from the database is:",ndropmobile)
+        print("Number of entries where personal entries (Name/Id and mobile) are dropped from the database is:",npentry)
+        print("Number of entries where car makes are dropped from the database is:",ndropcmake)
+        print("Number of entries where car models(year) are dropped from the database is:",ndropyear)
+        print("Number of entries where car Ids are dropped from the database is:",ncid)
+        print("\nSummary of data recovered from the database:")
+        print("Number of dublicate entries removed from the data base is:",ndub)
+        print("Number of entries with wrong date formats fixed in the new datebase is:",ndatechange)
+        print("Number of entries where names are recoverd in the new database is:",nrecoverednames)
+        print("Number of entries where Ids are recovered in the new database is:",nrecoveredids)
+        print("Number of entries where dates of birth are recovered in the new database is:",nrecovereddob)
+        print("Number of entries where mobiles are recovered in the new database is:",nrecoveredmobile)
+        print("Number of entries where car makes are recovered in the new database is:",nrecoveredcmake)
+        print("Number of entries where car models(year) are recovered in the new database is:",nrecoveredyear)
+
+
